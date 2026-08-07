@@ -2019,6 +2019,91 @@
       display: none; /* Hidden on desktop by default */
     }
   
+    /* --- PREMIUM DESIGN IMPROVEMENTS (inspired by lagunachico.com) --- */
+    /* Header size upgrades */
+    .cortijo-website h2 {
+      font-size: clamp(2rem, 4vw, 3rem) !important;
+      letter-spacing: -0.01em !important;
+      font-weight: 700 !important;
+    }
+    .cortijo-website .section-title {
+      font-size: clamp(2rem, 4vw, 3rem) !important;
+      font-weight: 700 !important;
+      margin-top: 0.5rem;
+    }
+    
+    /* Elegant Hover Zoom Effects on room-cards */
+    .cortijo-website .room-card {
+      transition: all 0.45s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+      border: 1px solid var(--border) !important;
+    }
+    .cortijo-website .room-card:hover {
+      transform: translateY(-8px) scale(1.005) !important;
+      box-shadow: 0 22px 45px rgba(0, 0, 0, 0.12) !important;
+      border-color: var(--accent) !important;
+    }
+    .cortijo-website .room-card .room-slide img {
+      transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    }
+    .cortijo-website .room-card:hover .room-slide img {
+      transform: scale(1.04) !important;
+    }
+
+    /* Premium Dark Theme Section (Features) */
+    .cortijo-website .section-bg-dark {
+      background-color: #1c211e !important; /* Elegant dark charcoal/green */
+      color: #ffffff !important;
+      padding: 6rem 0 !important;
+    }
+    .cortijo-website .section-bg-dark .section-title {
+      color: #ffffff !important;
+    }
+    .cortijo-website .section-bg-dark .section-subtitle {
+      color: var(--accent) !important;
+    }
+    .cortijo-website .section-bg-dark .feature-card {
+      background-color: #242b27 !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+    .cortijo-website .section-bg-dark .feature-card h4 {
+      color: #ffffff !important;
+    }
+    .cortijo-website .section-bg-dark .feature-card p {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+    .cortijo-website .section-bg-dark .feature-icon-box {
+      background-color: rgba(255, 255, 255, 0.04) !important;
+      color: var(--accent) !important;
+    }
+    .cortijo-website .section-bg-dark .feature-card:hover {
+      background-color: #2a332e !important;
+      border-color: var(--accent) !important;
+      transform: translateY(-8px) !important;
+    }
+    .cortijo-website .section-bg-dark .feature-card:hover .feature-icon-box {
+      background-color: var(--accent) !important;
+      color: #ffffff !important;
+    }
+
+    /* Green WhatsApp Action Buttons */
+    .cortijo-website .whatsapp-btn {
+      border-color: #25D366 !important;
+      color: #25D366 !important;
+      transition: all 0.3s ease !important;
+    }
+    .cortijo-website .whatsapp-btn:hover {
+      background-color: #25D366 !important;
+      color: #ffffff !important;
+    }
+    .cortijo-website .whatsapp-btn i {
+      color: #25D366 !important;
+      transition: all 0.3s ease !important;
+    }
+    .cortijo-website .whatsapp-btn:hover i {
+      color: #ffffff !important;
+    }
     }
   </style>
 </head>
@@ -2074,7 +2159,7 @@
 
 
     <!-- Features Section -->
-    <section class="section section-bg-secondary">
+    <section class="section section-bg-dark">
       <div class="section-inner">
         <div class="section-header">
           <span class="section-subtitle" data-translate="featuresSubtitle">Diseñado para albergar grandes grupos con el máximo confort</span>
@@ -2635,42 +2720,47 @@
           <h3 data-translate="contactTitle" style="margin-bottom: 0.5rem;">Reserva tu Estancia</h3>
           <p data-translate="contactSubtitle" style="margin-bottom: 2rem;">Envíanos tu consulta y te responderemos en menos de 24 horas</p>
           
-          <form id="contactForm">
+          <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+            <!-- Consigue tu clave de formulario gratis en web3forms.com e insértala aquí -->
+            <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+            <input type="hidden" name="subject" value="Nueva Solicitud de Reserva - Cortijo Laguna Chico">
+            <input type="hidden" name="from_name" value="Web Cortijo Laguna Chico">
+
             <div class="contact-form-grid">
               <div class="form-group">
                 <label for="formName" data-translate="formName">Nombre completo</label>
-                <input type="text" id="formName" class="form-input" required data-translate-placeholder="formName" placeholder="Nombre completo">
+                <input type="text" id="formName" name="name" class="form-input" required data-translate-placeholder="formName" placeholder="Nombre completo">
               </div>
               <div class="form-group">
                 <label for="formEmail" data-translate="formEmail">Correo electrónico</label>
-                <input type="email" id="formEmail" class="form-input" required data-translate-placeholder="formEmail" placeholder="Correo electrónico">
+                <input type="email" id="formEmail" name="email" class="form-input" required data-translate-placeholder="formEmail" placeholder="Correo electrónico">
               </div>
               <div class="form-group">
                 <label for="formPhone" data-translate="formPhone">Número de móvil</label>
-                <input type="tel" id="formPhone" class="form-input" required data-translate-placeholder="formPhone" placeholder="Número de móvil">
+                <input type="tel" id="formPhone" name="phone" class="form-input" required data-translate-placeholder="formPhone" placeholder="Número de móvil">
               </div>
               <div class="form-group">
                 <label for="formArrival" data-translate="formArrival">Fecha de llegada</label>
-                <input type="date" id="formArrival" class="form-input" required>
+                <input type="date" id="formArrival" name="arrival_date" class="form-input" required>
               </div>
               <div class="form-group">
                 <label for="formNights" data-translate="formNights">Número de noches</label>
-                <input type="number" id="formNights" class="form-input" min="1" value="2" required>
+                <input type="number" id="formNights" name="nights" class="form-input" min="1" value="2" required>
               </div>
               <div class="form-group">
                 <label for="formGuests" data-translate="formGuests">Número de huéspedes</label>
-                <input type="number" id="formGuests" class="form-input" min="1" max="25" value="18" required>
+                <input type="number" id="formGuests" name="guests" class="form-input" min="1" max="25" value="18" required>
               </div>
               <div class="form-group contact-form-full">
                 <label for="formEventType" data-translate="formEventType">Tipo de estancia</label>
-                <select id="formEventType" class="form-input">
+                <select id="formEventType" name="stay_type" class="form-input">
                   <option value="accommodation" data-translate="optionRegular">Alojamiento Rural</option>
                   <option value="event" data-translate="optionEvent">Evento + Alojamiento</option>
                 </select>
               </div>
               <div class="form-group contact-form-full">
                 <label for="formMessage" data-translate="formMessage">Tu mensaje / Comentarios</label>
-                <textarea id="formMessage" class="form-input" rows="4" data-translate-placeholder="formMessage" placeholder="Tu mensaje / Comentarios"></textarea>
+                <textarea id="formMessage" name="message" class="form-input" rows="4" data-translate-placeholder="formMessage" placeholder="Tu mensaje / Comentarios"></textarea>
               </div>
             </div>
             
@@ -2715,14 +2805,14 @@
                   <div class="contact-person" style="margin-bottom: 0.75rem;">
                     <p style="font-weight: 600;">Santiago: 685 319 023</p>
                     <div class="contact-actions" style="display: flex; gap: 0.5rem; margin-top: 0.35rem;">
-                      <a href="data:text/vcard;charset=utf-8;base64,QkVHSU46VkNBUkQKVkVSU0lPTjozLjAKRk46U2FudGlhZ28gLSBDb3J0aWpvIExhZ3VuYSBDaGljbwpOOjtTYW50aWFnbzs7OwpURUw7VFlQRT1DRUxMO1RZUEU9Vk9JQ0U6KzM0Njg1MzE5MDIzCkVNQUlMO1RZUEU9UFJFRixJTlRFUk5FVDppbmZvQGNvcnRpam9sYWd1bmFjaGljby5jb20KQURSO1RZUEU9V09SSyxQT1NUQUwsUEFSQ0VMOjs7Q2FsbGUgTGEgTGFndW5hIHMvbjtUb3JyZSBkZWwgTWFyO03Dg8KhbGFnYTsyOTc0MDtFc3Bhw4PCsWEKT1JHOkNvcnRpam8gTGFndW5hIENoaWNvClRJVExFOkNvbnRhY3RvClVSTDpodHRwczovL2NvcnRpam9sYWd1bmFjaGljby5jb20KRU5EOlZDQVJECg==" download="santiago.vcf" class="btn-action vcard-btn" title="Guardar Contacto"><i class="fa-solid fa-address-card"></i> Guardar</a>
+                      <a href="https://cortijolagunachico-star.github.io/CORTIJOLAGUNACHICO/santiago.vcf" target="_blank" class="btn-action vcard-btn" title="Guardar Contacto"><i class="fa-solid fa-address-card"></i> Guardar</a>
                       <a href="https://wa.me/34685319023" target="_blank" class="btn-action whatsapp-btn" title="Enviar WhatsApp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
                     </div>
                   </div>
                   <div class="contact-person">
                     <p style="font-weight: 600;">Antonio: 616 996 872</p>
                     <div class="contact-actions" style="display: flex; gap: 0.5rem; margin-top: 0.35rem;">
-                      <a href="data:text/vcard;charset=utf-8;base64,QkVHSU46VkNBUkQKVkVSU0lPTjozLjAKRk46QW50b25pbyAtIENvcnRpam8gTGFndW5hIENoaWNvCk46O0FudG9uaW87OzsKVEVMO1RZUEU9Q0VMTDtUWVBFPVZPSUNFOiszNDYxNjk5Njg3MgpFTUFJTDtUWVBFPVBSRUYsSU5URVJORVQ6aW5mb0Bjb3J0aWpvbGFndW5hY2hpY28uY29tCkFEUjtUWVBFPVdPUkssUE9TVEFMLFBBUkNFTDo7O0NhbGxlIExhIExhZ3VuYSBzL247VG9ycmUgZGVsIE1hcjtNw4PCoWxhZ2E7Mjk3NDA7RXNwYcODwrFhCk9SRzpDb3J0aWpvIExhZ3VuYSBDaGljbwpUSVRMRTpDb250YWN0bwpVUkw6aHR0cHM6Ly9jb3J0aWpvbGFndW5hY2hpY28uY29tCkVORDpWQ0FSRAo=" download="antonio.vcf" class="btn-action vcard-btn" title="Guardar Contacto"><i class="fa-solid fa-address-card"></i> Guardar</a>
+                      <a href="https://cortijolagunachico-star.github.io/CORTIJOLAGUNACHICO/antonio.vcf" target="_blank" class="btn-action vcard-btn" title="Guardar Contacto"><i class="fa-solid fa-address-card"></i> Guardar</a>
                       <a href="https://wa.me/34616996872" target="_blank" class="btn-action whatsapp-btn" title="Enviar WhatsApp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
                     </div>
                   </div>
@@ -3518,17 +3608,66 @@
             formStatus.style.display = "block";
           }
 
-          setTimeout(() => {
+          const formData = new FormData(contactForm);
+          const accessKey = formData.get("access_key");
+
+          const runMailtoFallback = () => {
+            const name = document.getElementById("formName") ? document.getElementById("formName").value : "";
+            const email = document.getElementById("formEmail") ? document.getElementById("formEmail").value : "";
+            const phone = document.getElementById("formPhone") ? document.getElementById("formPhone").value : "";
+            const arrival = document.getElementById("formArrival") ? document.getElementById("formArrival").value : "";
+            const nights = document.getElementById("formNights") ? document.getElementById("formNights").value : "";
+            const guests = document.getElementById("formGuests") ? document.getElementById("formGuests").value : "";
+            const stayTypeSelect = document.getElementById("formEventType");
+            const stayType = stayTypeSelect ? stayTypeSelect.options[stayTypeSelect.selectedIndex].text : "";
+            const message = document.getElementById("formMessage") ? document.getElementById("formMessage").value : "";
+
+            const subject = "Nueva Solicitud de Reserva - Cortijo Laguna Chico";
+            const body = `Nombre: ${name}%0ACorreo: ${email}%0ATeléfono: ${phone}%0AFecha de Llegada: ${arrival}%0ANoches: ${nights}%0AHuéspedes: ${guests}%0ATipo de Estancia: ${stayType}%0AMensaje: ${message}`;
+            
+            window.location.href = `mailto:info@lagunachico.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+
             if (formStatus) {
               formStatus.className = "form-status success";
-              formStatus.innerHTML = currentLang === "es" 
-                ? "¡Mensaje enviado con éxito! Nos pondremos en contacto contigo en breve." 
-                : "Message sent successfully! We will get in touch with you shortly.";
+              formStatus.innerHTML = currentLang === "es"
+                ? "Redirigiendo a tu gestor de correo para enviar la solicitud..."
+                : "Redirecting to your email client to send the request...";
               contactForm.reset();
-              if (calcInquireBtn) calcInquireBtn.style.display = "none";
-              if (calcResult) calcResult.innerHTML = `- €`;
+              if (typeof calcInquireBtn !== "undefined" && calcInquireBtn) calcInquireBtn.style.display = "none";
+              if (typeof calcResult !== "undefined" && calcResult) calcResult.innerHTML = `- €`;
             }
-          }, 1500);
+          };
+
+          // If they didn't configure a key yet, or it's the placeholder, run mailto fallback directly
+          if (!accessKey || accessKey === "YOUR_ACCESS_KEY_HERE" || accessKey.trim() === "") {
+            runMailtoFallback();
+            return;
+          }
+
+          // Otherwise, submit using Web3Forms API via AJAX
+          fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData
+          })
+          .then(async (response) => {
+            if (response.ok) {
+              if (formStatus) {
+                formStatus.className = "form-status success";
+                formStatus.innerHTML = currentLang === "es" 
+                  ? "¡Mensaje enviado con éxito! Nos pondremos en contacto contigo en breve." 
+                  : "Message sent successfully! We will get in touch with you shortly.";
+                contactForm.reset();
+                if (typeof calcInquireBtn !== "undefined" && calcInquireBtn) calcInquireBtn.style.display = "none";
+                if (typeof calcResult !== "undefined" && calcResult) calcResult.innerHTML = `- €`;
+              }
+            } else {
+              throw new Error("API submit error");
+            }
+          })
+          .catch((error) => {
+            console.error("Form submit error, running fallback:", error);
+            runMailtoFallback();
+          });
         });
       }
       // --- CALENDAR INTEGRATED LOGIC ---
