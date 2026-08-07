@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Antonio - Cortijo Laguna Chico
+N:;Antonio;;;
+TEL;TYPE=CELL;TYPE=VOICE:+34616996872
+EMAIL;TYPE=PREF,INTERNET:info@cortijolagunachico.com
+ADR;TYPE=WORK,POSTAL,PARCEL:;;Calle La Laguna s/n;Torre del Mar;Málaga;29740;España
+ORG:Cortijo Laguna Chico
+TITLE:Contacto
+URL:https://cortijolagunachico.com
+END:VCARD
