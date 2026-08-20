@@ -324,19 +324,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.35)), url('/web/image/12068/Casa%20desde%20Piscina.jpg') no-repeat center center/cover;
+      background: #000000;
       z-index: 1;
-      animation: heroZoomOut 12s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-      transform-origin: center center;
-    }
-
-    @keyframes heroZoomOut {
-      from {
-        transform: scale(1.5);
-      }
-      to {
-        transform: scale(1.0);
-      }
     }
 
     .cortijo-website .video-background {
@@ -348,10 +337,6 @@
       z-index: 1;
       overflow: hidden;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 1.5s ease;
-    }
-    .cortijo-website .video-background.ready {
       opacity: 1;
     }
     .cortijo-website .video-background::after {
