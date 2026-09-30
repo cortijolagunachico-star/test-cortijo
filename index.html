@@ -4471,69 +4471,135 @@
         }
       }
 
-      // Fetch calendar
+      // Fetch calendar with caching and parallel racing
+      const CALENDAR_CACHE_KEY = "cortijo_calendar_cache";
+      const CALENDAR_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours in ms
+
+      function saveCalendarCache(icsText) {
+        try {
+          localStorage.setItem(CALENDAR_CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            data: icsText
+          }));
+        } catch(e) { /* ignore storage errors */ }
+      }
+
+      function loadCalendarCache() {
+        try {
+          const cached = localStorage.getItem(CALENDAR_CACHE_KEY);
+          if (!cached) return null;
+          const parsed = JSON.parse(cached);
+          if (Date.now() - parsed.timestamp > CALENDAR_CACHE_TTL) {
+            localStorage.removeItem(CALENDAR_CACHE_KEY);
+            return null;
+          }
+          return parsed.data;
+        } catch(e) { return null; }
+      }
+
+      async function fetchWithTimeout(url, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const response = await fetch(url, { signal: controller.signal });
+          clearTimeout(timer);
+          return response;
+        } catch(e) {
+          clearTimeout(timer);
+          throw e;
+        }
+      }
+
+      // Race all sources in PARALLEL — first valid response wins
+      async function tryFetchCalendar() {
+        const icalFeedUrl = "https://calendar.google.com/calendar/ical/sanchezmoyano.com_or21ge4dr8jtf6nqh8fr2pikfg%40group.calendar.google.com/private-0bcb4d7b1c3599cd1fc656c9e3532843/basic.ics";
+
+        const sources = [
+          // Source 1: Google Apps Script
+          (async () => {
+            const response = await fetchWithTimeout(GOOGLE_SCRIPT_URL, 12000);
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const icsText = await response.text();
+            if (!icsText.includes("BEGIN:VCALENDAR")) throw new Error("Invalid ICS");
+            return icsText;
+          })(),
+          // Source 2: allorigins proxy
+          (async () => {
+            const url = "https://api.allorigins.win/get?url=" + encodeURIComponent(icalFeedUrl);
+            const response = await fetchWithTimeout(url, 12000);
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const data = await response.json();
+            if (!data.contents || !data.contents.includes("BEGIN:VCALENDAR")) throw new Error("Invalid ICS");
+            return data.contents;
+          })(),
+          // Source 3: corsproxy.io
+          (async () => {
+            const url = "https://corsproxy.io/?" + encodeURIComponent(icalFeedUrl);
+            const response = await fetchWithTimeout(url, 12000);
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const icsText = await response.text();
+            if (!icsText.includes("BEGIN:VCALENDAR")) throw new Error("Invalid ICS");
+            return icsText;
+          })()
+        ];
+
+        // Promise.any returns the first fulfilled promise
+        return Promise.any(sources);
+      }
+
       async function loadCalendar() {
         if (calendarLoading) {
           calendarLoading.style.display = "block";
           calendarLoading.innerHTML = translations[currentLang].calLoading;
+          calendarLoading.style.color = "";
         }
 
-        const icalFeedUrl = "https://calendar.google.com/calendar/ical/sanchezmoyano.com_or21ge4dr8jtf6nqh8fr2pikfg%40group.calendar.google.com/private-0bcb4d7b1c3599cd1fc656c9e3532843/basic.ics";
-        
-        if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.trim() !== "") {
+        // 1. Try to load from cache instantly
+        const cached = loadCalendarCache();
+        if (cached) {
+          cachedOccupiedDates = parseICS(cached);
+          renderCalendar(cachedOccupiedDates);
+          // Refresh in background silently
+          tryFetchCalendar().then(icsText => {
+            saveCalendarCache(icsText);
+            cachedOccupiedDates = parseICS(icsText);
+            renderCalendar(cachedOccupiedDates);
+          }).catch(() => {});
+          return;
+        }
+
+        // 2. No cache: fetch with 2 retries (all sources race in parallel each time)
+        const maxRetries = 2;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
           try {
-            const response = await fetch(GOOGLE_SCRIPT_URL);
-            if (!response.ok) throw new Error("Google Apps Script Fetch Failed");
-            const icsText = await response.text();
-            
-            if (!icsText.includes("BEGIN:VCALENDAR")) {
-              throw new Error("Invalid ICS content from Google Apps Script");
+            if (attempt > 1 && calendarLoading) {
+              calendarLoading.innerHTML = (currentLang === "es" 
+                ? "Reintentando cargar disponibilidad..." 
+                : "Retrying availability load...");
             }
-            
+            const icsText = await tryFetchCalendar();
+            saveCalendarCache(icsText);
             cachedOccupiedDates = parseICS(icsText);
             renderCalendar(cachedOccupiedDates);
             return;
-          } catch (error) {
-            console.warn("Apps Script method failed, trying CORS proxies...", error);
+          } catch (e) {
+            console.warn("Calendar load attempt " + attempt + " failed:", e.message);
+            if (attempt < maxRetries) {
+              await new Promise(r => setTimeout(r, 3000));
+            }
           }
         }
 
-        const primaryUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(icalFeedUrl);
-        const fallbackUrl = "https://corsproxy.io/?" + encodeURIComponent(icalFeedUrl);
-
-        try {
-          const response = await fetch(primaryUrl);
-          if (!response.ok) throw new Error("Primary CORS Proxy Failed");
-          const data = await response.json();
-          const icsText = data.contents;
-          
-          if (!icsText.includes("BEGIN:VCALENDAR")) {
-            throw new Error("Invalid ICS calendar content from primary proxy");
-          }
-          
-          cachedOccupiedDates = parseICS(icsText);
-          renderCalendar(cachedOccupiedDates);
-        } catch (error) {
-          console.warn("Primary CORS proxy failed, trying fallback...", error);
-          try {
-            const response = await fetch(fallbackUrl);
-            if (!response.ok) throw new Error("Fallback CORS Proxy Failed");
-            const icsText = await response.text();
-            
-            if (!icsText.includes("BEGIN:VCALENDAR")) {
-              throw new Error("Invalid ICS calendar content from fallback proxy");
-            }
-            
-            cachedOccupiedDates = parseICS(icsText);
-            renderCalendar(cachedOccupiedDates);
-          } catch (fallbackError) {
-            console.error("All proxies failed to load the calendar:", fallbackError);
-            if (calendarLoading) {
-              calendarLoading.innerHTML = translations[currentLang].calError;
-              calendarLoading.style.color = "var(--accent-red)";
-              calendarLoading.style.padding = "3rem 1.5rem";
-            }
-          }
+        // 3. All retries failed — show error with retry button
+        console.error("All calendar load attempts failed");
+        if (calendarLoading) {
+          calendarLoading.style.color = "var(--accent-red)";
+          calendarLoading.style.padding = "3rem 1.5rem";
+          calendarLoading.innerHTML = (currentLang === "es"
+            ? "No se pudo cargar la disponibilidad. "
+            : "Could not load availability. ")
+            + '<button onclick="loadCalendar()" style="cursor:pointer; margin-top:0.5rem; padding:0.5rem 1.5rem; background:var(--accent-gold); color:#fff; border:none; border-radius:6px; font-weight:600;">'
+            + (currentLang === "es" ? "Reintentar" : "Retry") + '</button>';
         }
       }
 
