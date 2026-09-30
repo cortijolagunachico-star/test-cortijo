@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <script>
@@ -3104,11 +3104,11 @@
           <h3 data-translate="contactTitle" style="margin-bottom: 0.5rem;">Reserva tu Estancia</h3>
           <p data-translate="contactSubtitle" style="margin-bottom: 2rem;">Envíanos tu consulta y te responderemos en menos de 24 horas</p>
           
-          <form id="contactForm" action="https://formsubmit.co/info@cortijolagunachico.com" method="POST">
-            <!-- Configuración de FormSubmit -->
-            <input type="hidden" name="_subject" value="Nueva Solicitud de Reserva - Cortijo Laguna Chico">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_captcha" value="false">
+          <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+            <!-- Configuración de Web3Forms -->
+            <input type="hidden" name="access_key" value="22fd71b8-8edc-48f0-a7e9-2eac519feaa9">
+            <input type="hidden" name="subject" value="Nueva Solicitud de Reserva - Cortijo Laguna Chico">
+            <input type="hidden" name="redirect" value="https://cortijolagunachico-star.github.io/CORTIJOLAGUNACHICO/?enviado=1">
 
             <div class="contact-form-grid">
               <div class="form-group">
@@ -4296,56 +4296,33 @@
       const contactForm = document.getElementById("contactForm");
       const formStatus = document.getElementById("formStatus");
 
+      // Show success message if returning from FormSubmit redirect
+      if (window.location.search.includes('enviado=1')) {
+        if (formStatus) {
+          formStatus.className = "form-status success";
+          formStatus.innerHTML = currentLang === "es" 
+            ? "¡Mensaje enviado con éxito! Nos pondremos en contacto contigo en breve." 
+            : "Message sent successfully! We will get in touch with you shortly.";
+          formStatus.style.display = "block";
+        }
+        // Scroll to contact section
+        const contactSection = document.getElementById("contacto");
+        if (contactSection) {
+          setTimeout(() => contactSection.scrollIntoView({ behavior: 'smooth' }), 500);
+        }
+        // Clean URL without reloading
+        history.replaceState(null, '', window.location.pathname + window.location.hash);
+      }
+
       if (contactForm) {
         contactForm.addEventListener("submit", (e) => {
-          e.preventDefault();
-          
           const consentCheckbox = document.getElementById("formConsentCheckbox");
           if (consentCheckbox && !consentCheckbox.checked) {
+            e.preventDefault();
             alert(currentLang === "es" ? "Debe aceptar la política de consentimiento de datos." : "You must accept the data consent policy.");
             return;
           }
-          
-          if (formStatus) {
-            formStatus.className = "form-status sending";
-            formStatus.innerHTML = currentLang === "es" ? "Enviando solicitud..." : "Sending request...";
-            formStatus.style.display = "block";
-          }
-
-          const formData = new FormData(contactForm);
-
-          // Submit using FormSubmit.co API via AJAX
-          fetch("https://formsubmit.co/ajax/info@cortijolagunachico.com", {
-            method: "POST",
-            body: formData
-          })
-          .then(response => {
-            if (response.ok) {
-              return response.json();
-            } else {
-              throw new Error("HTTP error " + response.status);
-            }
-          })
-          .then(data => {
-            if (formStatus) {
-              formStatus.className = "form-status success";
-              formStatus.innerHTML = currentLang === "es" 
-                ? "¡Mensaje enviado con éxito! Nos pondremos en contacto contigo en breve." 
-                : "Message sent successfully! We will get in touch with you shortly.";
-              contactForm.reset();
-              if (typeof calcInquireBtn !== "undefined" && calcInquireBtn) calcInquireBtn.style.display = "none";
-              if (typeof calcResult !== "undefined" && calcResult) calcResult.innerHTML = `- €`;
-            }
-          })
-          .catch((error) => {
-            console.error("Form submit error:", error);
-            if (formStatus) {
-              formStatus.className = "form-status error";
-              formStatus.innerHTML = currentLang === "es"
-                ? "Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo o escríbenos a info@cortijolagunachico.com"
-                : "There was an error sending the form. Please try again or write to info@cortijolagunachico.com";
-            }
-          });
+          // Native POST submit — no fetch, no CORS issues
         });
       }
       // --- CALENDAR INTEGRATED LOGIC ---
@@ -4818,7 +4795,7 @@
         }
 
         player = new YT.Player('youtube-player', {
-          videoId: '7puOub3_MR8',
+          videoId: 'lyItG8B3GH0',
           playerVars: playerVars,
           events: {
             'onReady': onPlayerReady,
